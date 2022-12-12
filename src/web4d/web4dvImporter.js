@@ -33,6 +33,7 @@ const resourceManager = new ResourceManagerXHR();
 // MAIN CLASS MANAGING A 4DS
 export default class WEB4DS {
   constructor(id, urlD, urlM, urlA, position, renderer, scene, camera) {
+    this.firstLoaded = false;
     /** properties, options and status modifiable by user **/
 
     // properties
@@ -162,9 +163,30 @@ export default class WEB4DS {
     this.renderer.shadowMapSoft = true;
   }
 
+  getResolvedPromise() {
+    if (!this.resolvedPromise) {
+      // eslint-disable-next-line no-unused-vars
+      this.resolvedPromise = new Promise((resolve, reject) => {
+        setInterval(() => {
+          if (this.firstLoaded) {
+            resolve(true);
+          }
+        }, 10);
+      });
+    }
+    return this.resolvedPromise;
+  }
+
   // methods
   load(showPlaceholder, playOnload, callback) {
     if (!this.isLoaded) {
+      const waiterHtml = document.getElementById("web4dv-waiter");
+      if (this.waiterElem && !this.waiterDisplayed) {
+        // Display waiter
+        waiterHtml.style.display = "block";
+        this.waiterDisplayed = true;
+      }
+
       this.showPlaceholder = showPlaceholder;
       this.playOnload = playOnload;
 
@@ -195,10 +217,10 @@ export default class WEB4DS {
 
         this.loadAudio(this.urlA);
 
-        const waiterHtml = document.getElementById("web4dv-waiter");
-
         const waiter = setInterval(() => {
           if (Decoder4D._meshesCache.length >= Decoder4D._maxCacheSize) {
+            console.log("qweasdzxc");
+            this.firstLoaded = true;
             clearInterval(waiter); // Stop the waiter loop
 
             if (this.waiterElem) {
@@ -223,14 +245,14 @@ export default class WEB4DS {
                 callback();
               }
             }
-          } else {
+          } /*else {
             // Start waiter animation
-            if (this.waiterElem && !this.waiterDisplayed) {
-              // Display waiter
-              waiterHtml.style.display = "block";
-              this.waiterDisplayed = true;
-            }
-          }
+            // if (this.waiterElem && !this.waiterDisplayed) {
+            //   // Display waiter
+            //   waiterHtml.style.display = "block";
+            //   this.waiterDisplayed = true;
+            // }
+          }*/
         }, 0.1);
 
         this.isLoaded = true;

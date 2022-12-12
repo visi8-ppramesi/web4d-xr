@@ -1,7 +1,21 @@
 <template>
   <div>
-    <button id="btnPause" class="button4D" @click="pauseFn">PAUSE</button>
-    <button id="btnPlay" class="button4D" @click="playFn">PLAY</button>
+    <button
+      id="btnPause"
+      class="button4D"
+      :disabled="isButtonDisabled"
+      @click="pauseFn"
+    >
+      PAUSE
+    </button>
+    <button
+      id="btnPlay"
+      class="button4D"
+      :disabled="isButtonDisabled"
+      @click="playFn"
+    >
+      PLAY
+    </button>
   </div>
   <div id="viewer-container">
     <canvas id="viewer-canvas"></canvas>
@@ -14,6 +28,7 @@ export default {
   data() {
     return {
       fourDScene: null,
+      isButtonDisabled: true,
     };
   },
   mounted() {
@@ -26,6 +41,11 @@ export default {
     ]);
     this.playFn = this.fourDScene.getPlayFunction();
     this.pauseFn = this.fourDScene.getPauseFunction();
+    console.log(1);
+    this.fourDScene.web4dmodel.getResolvedPromise().then(() => {
+      console.log(2);
+      this.isButtonDisabled = false;
+    });
   },
   // methods: {
   //   pauseFn(){

@@ -1,7 +1,7 @@
 <template>
   <div class="home">
-    <router-link to="/ar"><button>Show AR Scene</button></router-link>
-    <router-link to="/viewer"><button>Show 4D Viewer</button></router-link>
+    <button @click="$router.push('/ar')">Show AR Scene</button>
+    <button @click="$router.push('/viewer')">Show 4D Viewer</button>
   </div>
 </template>
 

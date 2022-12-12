@@ -76,10 +76,11 @@
 /* eslint-disable no-unused-vars */
 import WEB4DS from "./web4dvImporter.js";
 import * as THREE from "three";
+import OrbitControls from "./shitFuckOrbitControls";
 import WEBGL from "./webgl";
 
 export default class Web4DScene {
-  constructor(canvasElement, modelArray) {
+  constructor(containerElement, canvasElement, modelArray) {
     this.renderer;
     this.canvas = canvasElement;
     this.container = this.canvas.parentNode;
@@ -123,7 +124,7 @@ export default class Web4DScene {
       100
     );
     this.camera.position.set(0, 2, 5);
-    this.controls = new THREE.OrbitControls(this.camera, this.container);
+    this.controls = new OrbitControls(this.camera, this.container);
     this.controls.target = new THREE.Vector3(0, 0, 0);
     this.scene.add(this.camera);
 
@@ -144,7 +145,7 @@ export default class Web4DScene {
       this.container.offsetWidth,
       this.container.offsetHeight
     );
-    document.body.appendChild(this.renderer.domElement);
+    // containerElement.appendChild(this.renderer.domElement);
 
     /************************
      * START 4Dviews' WEB4DV *
@@ -154,7 +155,7 @@ export default class Web4DScene {
     let current4DSequence = null;
 
     this.web4dmodel = new WEB4DS(
-      "business",
+      "Welcome",
       modelArray[0],
       modelArray[1],
       modelArray[2],
@@ -163,11 +164,15 @@ export default class Web4DScene {
       this.scene,
       this.camera
     );
-    this.web4dmodel.load(false, false);
+    this.web4dmodel.load(false, true);
 
-    this.renderer.setAnimationLoop(function (tstamp, frame) {
-      this.renderer.render(this.scene, this.camera);
-    });
+    this.renderer.setAnimationLoop(
+      function (tstamp, frame) {
+        this.renderer.render(this.scene, this.camera);
+      }.bind(this)
+    );
+    this.renderer.xr.enabled = true;
+    window.web4dmodel = this.web4dmodel;
   }
 
   clearTimeline() {}
@@ -244,7 +249,7 @@ export function build4DScene(canvasElement, modelArray) {
     100
   );
   camera.position.set(0, 2, 5);
-  var controls = new THREE.OrbitControls(camera, container);
+  var controls = new OrbitControls(camera, container);
   controls.target = new THREE.Vector3(0, 0, 0);
   scene.add(camera);
 

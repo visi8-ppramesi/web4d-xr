@@ -158,17 +158,18 @@ export default class Model4D {
     /* flags */
     this.geometry.attributes.position.needsUpdate = true;
 
-    if (this.mesh.geometry.drawRange.count !== nbFaces * 3) {
-      this.mesh.geometry.index.array = Faces;
-      this.geometry.attributes.uv.array = UVs;
-      this.geometry.attributes.uv.needsUpdate = true;
-      this.mesh.geometry.index.needsUpdate = true;
-      this.geometry.attributes.normal.array = Normals;
-      this.geometry.attributes.normal.needsUpdate = true;
+    // if (this.mesh.geometry.drawRange.count !== nbFaces * 3) {
+    console.log("asdfasdfasdfasdfasdf");
+    this.mesh.geometry.index.array = Faces;
+    this.geometry.attributes.uv.array = UVs;
+    this.geometry.attributes.uv.needsUpdate = true;
+    this.mesh.geometry.index.needsUpdate = true;
+    this.geometry.attributes.normal.array = Normals;
+    this.geometry.attributes.normal.needsUpdate = true;
 
-      /* to use only part of the buffer */
-      this.geometry.setDrawRange(0, nbFaces * 3);
-    }
+    /* to use only part of the buffer */
+    this.geometry.setDrawRange(0, nbFaces * 3);
+    // }
 
     this.mesh.rotation.x = -1.57;
 

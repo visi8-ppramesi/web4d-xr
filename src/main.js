@@ -11,7 +11,7 @@ const vuePropertySetter = (app, name, instance) => {
 };
 const injector = {
   install(app) {
-    vuePropertySetter(app, "scriptInjector", scriptInjector);
+    vuePropertySetter(app, "injectScript", scriptInjector);
     vuePropertySetter(app, "detectMobile", detectMobile);
   },
 };

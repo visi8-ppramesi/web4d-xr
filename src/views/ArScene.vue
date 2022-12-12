@@ -1,17 +1,24 @@
 <template>
   <div class="over">
-    <span id="promptText">Loading...</span>
-    <div id="progressBar" style="display: none">
-      <div id="playProgress"></div>
-      <div id="loadProgress"></div>
+    <span ref="promptText" id="promptText">Loading...</span>
+    <div ref="progressBar" id="progressBar" style="display: none">
+      <div ref="playProgress" id="playProgress"></div>
+      <div ref="loadProgress" id="loadProgress"></div>
     </div>
     <img
+      ref="pauseBtn"
       id="pauseBtn"
       class="media-btn"
       :src="pauseBtn"
       style="display: none"
     />
-    <img id="muteBtn" class="media-btn" :src="muteBtn" style="display: none" />
+    <img
+      ref="muteBtn"
+      id="muteBtn"
+      class="media-btn"
+      :src="muteBtn"
+      style="display: none"
+    />
     <div id="gradient-box"></div>
   </div>
   <div id="scene-container"></div>
@@ -31,14 +38,38 @@ export default {
       muteBtn: require("../assets/icons/mute.svg"),
     };
   },
-  methods: {
-    mountScene() {
-      document.body.insertAdjacentHTML("beforeend", this.baseHtml);
+  watch: {
+    $route() {
+      this.destroyXr();
+      if (
+        this.loadingComponent &&
+        document.getElementsByClassName("vld-container").length > 0
+      ) {
+        this.loadingComponent.hide();
+      }
     },
   },
-  created() {
+  methods: {
+    mountScene() {
+      document.body.insertAdjacentHTML("beforeend", this.baseHtml.default);
+    },
+    destroyXr() {
+      const ascene = document.getElementsByTagName("a-scene")[0];
+      ascene.parentNode.removeChild(ascene);
+      const eightWallLoading = document.getElementById("loadingContainer");
+      if (eightWallLoading !== null) {
+        eightWallLoading.parentNode.removeChild(eightWallLoading);
+      }
+      const html = document.getElementsByTagName("html")[0];
+      html.className = this.origHtmlClass;
+      window.removeEventListener("xrloaded", this.mountScene);
+    },
+  },
+  mounted() {
     let scriptPromise;
-    if (!document.getElementById("8thwall-script") && this.detectMobile()) {
+    const { promptText, progressBar, playProgress, pauseBtn, muteBtn } =
+      this.$refs;
+    if (!document.getElementById("8thwall-script")) {
       scriptPromise = Promise.all([
         this.injectScript(
           "8thwall-script",
@@ -53,7 +84,13 @@ export default {
                 "xrextras-script",
                 `https://cdn.8thwall.com/web/xrextras/xrextras.js`,
                 () => {
-                  hologram4dsComponent(window.AFRAME);
+                  hologram4dsComponent(window.AFRAME, {
+                    promptText,
+                    progressBar,
+                    playProgress,
+                    pauseBtn,
+                    muteBtn,
+                  });
                   hologram4dsPrimitive(window.AFRAME);
                   return Promise.resolve(true);
                 }
@@ -70,7 +107,7 @@ export default {
       scriptPromise = Promise.resolve(true);
     }
     scriptPromise.then(() => {
-      this.mountScene();
+      window.addEventListener("xrloaded", this.mountScene);
     });
   },
 };

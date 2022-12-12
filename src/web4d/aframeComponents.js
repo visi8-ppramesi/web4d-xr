@@ -1,6 +1,9 @@
 import WEB4DS from "./web4dvImporter";
 
-const hologram4dsComponent = (aFrameInstance) => {
+const hologram4dsComponent = (
+  aFrameInstance,
+  { promptText, progressBar, playProgress, pauseBtn, muteBtn }
+) => {
   const component = {
     schema: {
       "main-4ds": { type: "asset" }, // 4ds video file to play (mobile version)
@@ -14,11 +17,18 @@ const hologram4dsComponent = (aFrameInstance) => {
     init() {
       this.model4DS = null; // hologram object
       const scene = document.querySelector("a-scene");
-      this.prompt = document.getElementById("promptText");
-      this.progressBar = document.getElementById("progressBar");
-      this.playProgress = document.getElementById("playProgress");
-      this.pauseBtn = document.getElementById("pauseBtn");
-      this.muteBtn = document.getElementById("muteBtn");
+
+      this.prompt = promptText;
+      this.progressBar = progressBar;
+      this.playProgress = playProgress;
+      this.pauseBtn = pauseBtn;
+      this.muteBtn = muteBtn;
+
+      // this.prompt = document.getElementById("promptText");
+      // this.progressBar = document.getElementById("progressBar");
+      // this.playProgress = document.getElementById("playProgress");
+      // this.pauseBtn = document.getElementById("pauseBtn");
+      // this.muteBtn = document.getElementById("muteBtn");
       this.ground = document.getElementById("ground");
       // runs when hologram is loaded and ready for playback
       const readytoplay = () => {

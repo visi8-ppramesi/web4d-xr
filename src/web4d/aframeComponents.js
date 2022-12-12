@@ -1,148 +1,171 @@
-import WEB4DS from './web4dvImporter'
+import WEB4DS from "./web4dvImporter";
 
-/* globals WEB4DS, ResourceManagerXHR, Model4D, Decoder4D */
-const hologram4dsComponent = () => ({
+const hologram4dsComponent = (aFrameInstance) => {
+  const component = {
     schema: {
-        'main-4ds': { type: 'asset' },                // 4ds video file to play (mobile version)
-        'secondary-4ds': { type: 'asset' },           // 4ds video file to play (desktop version)
-        'audio-4ds': { type: 'asset' },               // audio file. Keep blank if no audio or if embedded in 4ds file.
-        'size': { default: 1 },                       // hologram starting size
-        'touch-target-size': { default: '1.5 0.5' },  // size of touch target cylinder: height, radius
-        'touch-target-offset': { default: '0 0' },    // offset of touch target cylinder: x, z
-        'touch-target-visible': { default: false },   // show touch target for debugging
+      "main-4ds": { type: "asset" }, // 4ds video file to play (mobile version)
+      "secondary-4ds": { type: "asset" }, // 4ds video file to play (desktop version)
+      "audio-4ds": { type: "asset" }, // audio file. Keep blank if no audio or if embedded in 4ds file.
+      size: { default: 1 }, // hologram starting size
+      "touch-target-size": { default: "1.5 0.5" }, // size of touch target cylinder: height, radius
+      "touch-target-offset": { default: "0 0" }, // offset of touch target cylinder: x, z
+      "touch-target-visible": { default: false }, // show touch target for debugging
     },
     init() {
-        this.model4DS = null                        // hologram object
-        const scene = document.querySelector('a-scene')
-        this.prompt = document.getElementById('promptText')
-        this.progressBar = document.getElementById('progressBar')
-        this.playProgress = document.getElementById('playProgress')
-        this.pauseBtn = document.getElementById('pauseBtn')
-        this.muteBtn = document.getElementById('muteBtn')
-        this.ground = document.getElementById('ground')
-        // runs when hologram is loaded and ready for playback
-        const readytoplay = () => {
-            this.prompt.innerHTML = 'Tap to Place Hologram'
-            this.prompt.style.display = 'block'
-            this.ground.addEventListener('mousedown', this.placeHologram, { once: true })
+      this.model4DS = null; // hologram object
+      const scene = document.querySelector("a-scene");
+      this.prompt = document.getElementById("promptText");
+      this.progressBar = document.getElementById("progressBar");
+      this.playProgress = document.getElementById("playProgress");
+      this.pauseBtn = document.getElementById("pauseBtn");
+      this.muteBtn = document.getElementById("muteBtn");
+      this.ground = document.getElementById("ground");
+      // runs when hologram is loaded and ready for playback
+      const readytoplay = () => {
+        this.prompt.innerHTML = "Tap to Place Hologram";
+        this.prompt.style.display = "block";
+        this.ground.addEventListener("mousedown", this.placeHologram, {
+          once: true,
+        });
+      };
+      this.model4DS = new WEB4DS(
+        "Welcome", // unique id
+        this.data["secondary-4ds"], // url Desktop format
+        this.data["main-4ds"], // url Mobile format
+        this.data["audio-4ds"], // url Audio
+        [0, 0, 0], // position
+        scene.renderer, // renderer
+        scene, // scene
+        scene.camera // camera
+      );
+      // Set the option to keep the downloaded data in cache, to avoid a new download upon each loop
+      this.model4DS.keepsChunksInCache(false);
+      this.model4DS.setWaitingGif(
+        // empty transparent pixel disables waiting GIF
+        "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII="
+      );
+      // This loads (i.e. starts downloading) the 4ds file data.
+      this.model4DS.load(
+        false, // showPlaceholder: displays the first frame while loading
+        false, // playOnLoad: play sequence automatically after it has loaded
+        readytoplay // runs after the sequence has been loaded
+      );
+      this.placeHologram = (event) => {
+        // hide "Tap to Place Hologram" text + show playback UI
+        this.prompt.style.display = "none";
+        this.pauseBtn.style.display = "block";
+        this.muteBtn.style.display = "block";
+        this.progressBar.style.display = "block";
+        // place hologram at touchpoint
+        const touchPoint = event.detail.intersection.point;
+        this.el.object3D.position.set(touchPoint.x, 0, touchPoint.z);
+        // ensures hologram is always being rendered
+        this.model4DS.model4D.mesh.frustumCulled = false;
+        // rotates hologram towards camera for initial placement
+        const camRot = this.el.sceneEl.camera.el.object3D.rotation;
+        const thisRot = this.el.object3D.rotation;
+        thisRot.set(thisRot.x, camRot.y - Math.PI / 2, thisRot.z);
+        // begin hologram playback
+        this.model4DS.play();
+        // add a cylinder primitive to receive raycasting for gestures.
+        // It is raised slightly off the ground to support tapping on the ground.
+        const [tapVolumeHeight, tapVolumeRadius] = this.data[
+          "touch-target-size"
+        ]
+          .split(" ")
+          .map((v) => Number(v));
+        const [tapTargetOffsetX, tapTargetOffsetZ] = this.data[
+          "touch-target-offset"
+        ]
+          .split(" ")
+          .map((v) => Number(v));
+        const touchTargetAlpha = this.data["touch-target-visible"] ? 0.2 : 0.0;
+        this.el.insertAdjacentHTML(
+          "beforeend",
+          `
+            <a-entity 
+            geometry="primitive: cylinder; height: ${
+              tapVolumeHeight - 0.15
+            }; radius: ${tapVolumeRadius}" 
+            material="transparent: true; opacity: ${touchTargetAlpha}; depthTest: false;" 
+            position="${tapTargetOffsetX} ${
+            (tapVolumeHeight - 0.15) * 0.5 + 0.15
+          } ${tapTargetOffsetZ}" 
+            class="cantap"
+            shadow="cast: false; receive: false">
+            </a-entity>`
+        );
+        // animate hologram in from a small scale to its end scale
+        const minS = this.data.size / 50;
+        const maxS = this.data.size;
+        this.el.setAttribute("scale", `${minS} ${minS} ${minS}`);
+        this.el.setAttribute("animation", {
+          property: "scale",
+          to: `${maxS} ${maxS} ${maxS}`,
+          easing: "easeOutElastic",
+          dur: 800,
+          delay: 300,
+        });
+      };
+      // Play/Pause functionality
+      const playImg = require("../assets/icons/play.svg");
+      const pauseImg = require("../assets/icons/pause.svg");
+      const pauseHolo = () => {
+        if (this.model4DS.isPlaying) {
+          this.pauseBtn.src = playImg;
+          this.model4DS.pause(); // pause hologram
+        } else {
+          this.pauseBtn.src = pauseImg;
+          this.model4DS.play(); // play hologram
         }
-        this.model4DS = new WEB4DS(
-            'Welcome',                   // unique id
-            this.data['secondary-4ds'],  // url Desktop format
-            this.data['main-4ds'],       // url Mobile format
-            this.data['audio-4ds'],      // url Audio
-            [0, 0, 0],                   // position
-            scene.renderer,              // renderer
-            scene,                       // scene
-            scene.camera                 // camera
-        )
-        // Set the option to keep the downloaded data in cache, to avoid a new download upon each loop
-        this.model4DS.keepsChunksInCache(false)
-        this.model4DS.setWaitingGif(  // empty transparent pixel disables waiting GIF
-            'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII='
-        )
-        // This loads (i.e. starts downloading) the 4ds file data.
-        this.model4DS.load(
-            false,       // showPlaceholder: displays the first frame while loading
-            false,       // playOnLoad: play sequence automatically after it has loaded
-            readytoplay  // runs after the sequence has been loaded
-        )
-        this.placeHologram = (event) => {
-            // hide "Tap to Place Hologram" text + show playback UI
-            this.prompt.style.display = 'none'
-            this.pauseBtn.style.display = 'block'
-            this.muteBtn.style.display = 'block'
-            this.progressBar.style.display = 'block'
-            // place hologram at touchpoint
-            const touchPoint = event.detail.intersection.point
-            this.el.object3D.position.set(touchPoint.x, 0, touchPoint.z)
-            // ensures hologram is always being rendered
-            this.model4DS.model4D.mesh.frustumCulled = false
-            // rotates hologram towards camera for initial placement
-            const camRot = this.el.sceneEl.camera.el.object3D.rotation
-            const thisRot = this.el.object3D.rotation
-            thisRot.set(thisRot.x, camRot.y - Math.PI / 2, thisRot.z)
-            // begin hologram playback
-            this.model4DS.play()
-            // add a cylinder primitive to receive raycasting for gestures.
-            // It is raised slightly off the ground to support tapping on the ground.
-            const [tapVolumeHeight, tapVolumeRadius] =
-                this.data['touch-target-size'].split(' ').map(v => Number(v))
-            const [tapTargetOffsetX, tapTargetOffsetZ] =
-                this.data['touch-target-offset'].split(' ').map(v => Number(v))
-            const touchTargetAlpha = this.data['touch-target-visible'] ? 0.2 : 0.0
-            this.el.insertAdjacentHTML('beforeend', `
-        <a-entity 
-          geometry="primitive: cylinder; height: ${tapVolumeHeight - 0.15}; radius: ${tapVolumeRadius}" 
-          material="transparent: true; opacity: ${touchTargetAlpha}; depthTest: false;" 
-          position="${tapTargetOffsetX} ${(tapVolumeHeight - 0.15) * 0.5 + 0.15} ${tapTargetOffsetZ}" 
-          class="cantap"
-          shadow="cast: false; receive: false">
-        </a-entity>`)
-            // animate hologram in from a small scale to its end scale
-            const minS = this.data.size / 50
-            const maxS = this.data.size
-            this.el.setAttribute('scale', `${minS} ${minS} ${minS}`)
-            this.el.setAttribute('animation', {
-                property: 'scale',
-                to: `${maxS} ${maxS} ${maxS}`,
-                easing: 'easeOutElastic',
-                dur: 800,
-                delay: 300,
-            })
+      };
+      this.pauseBtn.addEventListener("click", pauseHolo);
+      // Mute/Unmute functionality
+      const muteImg = require("../assets/icons/mute.svg");
+      const soundImg = require("../assets/icons/sound.svg");
+      const muteHolo = () => {
+        if (!this.model4DS.isMuted) {
+          this.muteBtn.src = muteImg;
+          this.model4DS.mute(); // mute hologram
+        } else {
+          this.muteBtn.src = soundImg;
+          this.model4DS.unmute(); // unmute hologram
         }
-        // Play/Pause functionality
-        const playImg = require('../assets/icons/play.svg')
-        const pauseImg = require('../assets/icons/pause.svg')
-        const pauseHolo = () => {
-            if (this.model4DS.isPlaying) {
-                this.pauseBtn.src = playImg
-                this.model4DS.pause()  // pause hologram
-            } else {
-                this.pauseBtn.src = pauseImg
-                this.model4DS.play()  // play hologram
-            }
-        }
-        this.pauseBtn.addEventListener('click', pauseHolo)
-        // Mute/Unmute functionality
-        const muteImg = require('../assets/icons/mute.svg')
-        const soundImg = require('../assets/icons/sound.svg')
-        const muteHolo = () => {
-            if (!this.model4DS.isMuted) {
-                this.muteBtn.src = muteImg
-                this.model4DS.mute()    // mute hologram
-            } else {
-                this.muteBtn.src = soundImg
-                this.model4DS.unmute()  // unmute hologram
-            }
-        }
-        this.muteBtn.addEventListener('click', muteHolo)
+      };
+      this.muteBtn.addEventListener("click", muteHolo);
     },
     tick() {
-        if (this.model4DS != null && this.model4DS.isLoaded) {
-            this.model4DS.update()
-            if (this.playProgress != null) {
-                this.playProgress.style.width =
-                    `${(100 * (this.model4DS.currentFrame / this.model4DS.sequenceTotalLength))}%`
-            }
+      if (this.model4DS != null && this.model4DS.isLoaded) {
+        this.model4DS.update();
+        if (this.playProgress != null) {
+          this.playProgress.style.width = `${
+            100 *
+            (this.model4DS.currentFrame / this.model4DS.sequenceTotalLength)
+          }%`;
         }
+      }
     },
-})
-const hologram4dsPrimitive = () => ({
+  };
+  aFrameInstance.registerComponent("holo4ds", component);
+};
+const hologram4dsPrimitive = (aFrameInstance) => {
+  const primitive = {
     defaultComponents: {
-        holo4ds: {},
+      holo4ds: {},
     },
     mappings: {
-        'main-4ds': 'holo4ds.main-4ds',
-        'secondary-4ds': 'holo4ds.secondary-4ds',
-        'audio-4ds': 'holo4ds.audio-4ds',
-        'size': 'holo4ds.size',
-        'touch-target-size': 'holo4ds.touch-target-size',
-        'touch-target-offset': 'holo4ds.touch-target-offset',
-        'touch-target-visible': 'holo4ds.touch-target-visible',
+      "main-4ds": "holo4ds.main-4ds",
+      "secondary-4ds": "holo4ds.secondary-4ds",
+      "audio-4ds": "holo4ds.audio-4ds",
+      size: "holo4ds.size",
+      "touch-target-size": "holo4ds.touch-target-size",
+      "touch-target-offset": "holo4ds.touch-target-offset",
+      "touch-target-visible": "holo4ds.touch-target-visible",
     },
-})
-export { hologram4dsComponent, hologram4dsPrimitive }
+  };
+  aFrameInstance.registerPrimitive("hologram-4ds", primitive);
+};
+export { hologram4dsComponent, hologram4dsPrimitive };
 /// ///////////////////////4DViews web4dvImporter.js///////////////////////////////////////////////
 // const resourceManager = new ResourceManagerXHR()
 // // MAIN CLASS MANAGING A 4DS

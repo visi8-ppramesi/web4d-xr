@@ -145,7 +145,7 @@ export default class Web4DScene {
       this.container.offsetWidth,
       this.container.offsetHeight
     );
-    // containerElement.appendChild(this.renderer.domElement);
+    containerElement.appendChild(this.renderer.domElement);
 
     /************************
      * START 4Dviews' WEB4DV *
@@ -164,7 +164,7 @@ export default class Web4DScene {
       this.scene,
       this.camera
     );
-    this.web4dmodel.load(false, true);
+    this.web4dmodel.load(false, false);
 
     this.renderer.setAnimationLoop(
       function (tstamp, frame) {
@@ -182,32 +182,41 @@ export default class Web4DScene {
       this.web4dmodel.destroy(function () {
         this.web4dmodel.load(false, true);
       });
-    };
+    }.bind(this);
   }
 
   getDestroyFunction() {
     return function () {
+      console.log("destroy clicked");
       this.web4dmodel.destroy();
       this.clearTimeline();
-    };
+    }.bind(this);
   }
 
   getPlayFunction() {
     return function () {
+      console.log("play clicked");
       this.web4dmodel.play(true);
-    };
+    }.bind(this);
+  }
+
+  getPauseFunction() {
+    return function () {
+      console.log("pause clicked");
+      this.web4dmodel.pause();
+    }.bind(this);
   }
 
   getMuteFunction() {
     return function () {
       this.web4dmodel.mute();
-    };
+    }.bind(this);
   }
 
   getUnmuteFunction() {
     return function () {
       this.web4dmodel.unmute();
-    };
+    }.bind(this);
   }
 }
 

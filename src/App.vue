@@ -1,5 +1,7 @@
 <template>
-  <router-view />
+  <div class="main-container">
+    <router-view />
+  </div>
 </template>
 
 <style>
@@ -9,6 +11,7 @@
   -moz-osx-font-smoothing: grayscale;
   text-align: center;
   color: #2c3e50;
+  background-color: #1a1e2f;
 }
 
 nav {
@@ -22,5 +25,10 @@ nav a {
 
 nav a.router-link-exact-active {
   color: #42b983;
+}
+
+.main-container {
+  width: 100%;
+  height: 100%;
 }
 </style>

@@ -110,7 +110,7 @@ export default class WEB4DS {
       this.waiterElem.style.opacity = waiterElemOpacity / 100;
       this.waiterElem.style.zIndex = "2";
 
-      this.waiterElemLogo.src = "img/waiter.gif";
+      this.waiterElemLogo.src = require("../assets/waiter.gif");
 
       if (this.waiterLoaded === false) {
         this.waiterParent.parentNode.insertBefore(

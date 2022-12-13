@@ -40,6 +40,7 @@ export default {
   },
   watch: {
     $route() {
+      console.log("testtest");
       this.destroyXr();
       if (
         this.loadingComponent &&
@@ -64,6 +65,16 @@ export default {
       html.className = this.origHtmlClass;
       window.removeEventListener("xrloaded", this.mountScene);
     },
+  },
+  unmounted() {
+    console.log("testtest");
+    this.destroyXr();
+    if (
+      this.loadingComponent &&
+      document.getElementsByClassName("vld-container").length > 0
+    ) {
+      this.loadingComponent.hide();
+    }
   },
   mounted() {
     let scriptPromise;

@@ -2,8 +2,8 @@ import WEB4DS from "./web4dvImporter";
 import mitt from "@/utils/emitter";
 
 const hologram4dsComponent = (
-  aFrameInstance,
-  { promptText, progressBar, playProgress, pauseBtn, muteBtn }
+  aFrameInstance
+  // { promptText, progressBar, playProgress, pauseBtn, muteBtn }
 ) => {
   const component = {
     schema: {
@@ -19,17 +19,17 @@ const hologram4dsComponent = (
       this.model4DS = null; // hologram object
       const scene = document.querySelector("a-scene");
 
-      this.prompt = promptText;
-      this.progressBar = progressBar;
-      this.playProgress = playProgress;
-      this.pauseBtn = pauseBtn;
-      this.muteBtn = muteBtn;
+      // this.prompt = promptText;
+      // this.progressBar = progressBar;
+      // this.playProgress = playProgress;
+      // this.pauseBtn = pauseBtn;
+      // this.muteBtn = muteBtn;
 
-      // this.prompt = document.getElementById("promptText");
-      // this.progressBar = document.getElementById("progressBar");
-      // this.playProgress = document.getElementById("playProgress");
-      // this.pauseBtn = document.getElementById("pauseBtn");
-      // this.muteBtn = document.getElementById("muteBtn");
+      this.prompt = document.getElementById("promptText");
+      this.progressBar = document.getElementById("progressBar");
+      this.playProgress = document.getElementById("playProgress");
+      this.pauseBtn = document.getElementById("pauseBtn");
+      this.muteBtn = document.getElementById("muteBtn");
       this.ground = document.getElementById("ground");
       // runs when hologram is loaded and ready for playback
       const readytoplay = () => {

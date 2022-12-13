@@ -66,8 +66,9 @@ export default {
   },
   mounted() {
     let scriptPromise;
-    const { promptText, progressBar, playProgress, pauseBtn, muteBtn } =
-      this.$refs;
+    // const { promptText, progressBar, playProgress, pauseBtn, muteBtn } =
+    //   this.$refs;
+    let runFunc = this.mountScene;
     if (!document.getElementById("8thwall-script")) {
       scriptPromise = Promise.all([
         this.injectScript(
@@ -83,13 +84,13 @@ export default {
                 "xrextras-script",
                 `https://cdn.8thwall.com/web/xrextras/xrextras.js`,
                 () => {
-                  hologram4dsComponent(window.AFRAME, {
+                  hologram4dsComponent(window.AFRAME); /*, {
                     promptText,
                     progressBar,
                     playProgress,
                     pauseBtn,
                     muteBtn,
-                  });
+                  });*/
                   hologram4dsPrimitive(window.AFRAME);
                   return Promise.resolve(true);
                 }
@@ -102,11 +103,14 @@ export default {
           }
         ),
       ]);
+      runFunc = () => {
+        window.addEventListener("xrloaded", this.mountScene);
+      };
     } else {
       scriptPromise = Promise.resolve(true);
     }
     scriptPromise.then(() => {
-      window.addEventListener("xrloaded", this.mountScene);
+      runFunc();
     });
   },
 };

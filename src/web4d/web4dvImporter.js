@@ -232,6 +232,7 @@ export default class WEB4DS {
             if (showPlaceholder === true) {
               // Placeholder equals frame 0
               // Display the frame 0
+              console.log("placeholder");
               this.currentMesh = Decoder4D._meshesCache.shift();
               this.currentFrame = this.currentMesh.frame;
               this.updateSequenceMesh(this.currentMesh);

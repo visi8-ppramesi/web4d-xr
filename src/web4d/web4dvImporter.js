@@ -26,6 +26,7 @@
 
 import { default as ResourceManagerXHR, Decoder4D } from "./web4dvResource.js";
 import { default as Model4D } from "./model4D_Three.js";
+import isMobile from "./mobileDetector";
 
 // 4Dviews variables
 const resourceManager = new ResourceManagerXHR();
@@ -190,7 +191,8 @@ export default class WEB4DS {
       this.showPlaceholder = showPlaceholder;
       this.playOnload = playOnload;
 
-      if (this.renderer.extensions.get("WEBGL_compressed_texture_astc")) {
+      //if (this.renderer.extensions.get("WEBGL_compressed_texture_astc")) {
+      if (isMobile()) {
         resourceManager.set4DSFile(this.urlM);
         Decoder4D.SetInputTextureEncoding(164);
       } else {

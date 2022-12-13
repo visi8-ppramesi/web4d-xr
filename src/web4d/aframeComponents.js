@@ -1,4 +1,5 @@
 import WEB4DS from "./web4dvImporter";
+import mitt from "@/utils/emitter";
 
 const hologram4dsComponent = (
   aFrameInstance,
@@ -40,8 +41,8 @@ const hologram4dsComponent = (
       };
       this.model4DS = new WEB4DS(
         "Welcome", // unique id
-        this.data["main-4ds"], // url Mobile format
         this.data["secondary-4ds"], // url Desktop format
+        this.data["main-4ds"], // url Mobile format
         this.data["audio-4ds"], // url Audio
         [0, 0, 0], // position
         scene.renderer, // renderer
@@ -60,6 +61,9 @@ const hologram4dsComponent = (
         false, // playOnLoad: play sequence automatically after it has loaded
         readytoplay // runs after the sequence has been loaded
       );
+      mitt.on("destroyModel", () => {
+        this.model4DS.destroy();
+      });
       this.placeHologram = (event) => {
         // hide "Tap to Place Hologram" text + show playback UI
         this.prompt.style.display = "none";

@@ -156,8 +156,8 @@ export default class Web4DScene {
 
     this.web4dmodel = new WEB4DS(
       "Welcome",
-      modelArray[0],
       modelArray[1],
+      modelArray[0],
       modelArray[2],
       [0, 0, 0],
       this.renderer,

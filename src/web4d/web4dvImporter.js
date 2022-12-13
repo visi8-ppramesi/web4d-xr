@@ -221,7 +221,6 @@ export default class WEB4DS {
 
         const waiter = setInterval(() => {
           if (Decoder4D._meshesCache.length >= Decoder4D._maxCacheSize) {
-            console.log("qweasdzxc");
             this.firstLoaded = true;
             clearInterval(waiter); // Stop the waiter loop
 

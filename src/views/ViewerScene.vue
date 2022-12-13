@@ -31,6 +31,14 @@ export default {
       isButtonDisabled: true,
     };
   },
+  watch: {
+    $route() {
+      this.fourDScene.web4dmodel.destroy();
+    },
+  },
+  unmounted() {
+    this.fourDScene.web4dmodel.destroy();
+  },
   mounted() {
     const canvas = document.getElementById("viewer-canvas");
     const container = document.getElementById("viewer-container");
@@ -41,9 +49,7 @@ export default {
     ]);
     this.playFn = this.fourDScene.getPlayFunction();
     this.pauseFn = this.fourDScene.getPauseFunction();
-    console.log(1);
     this.fourDScene.web4dmodel.getResolvedPromise().then(() => {
-      console.log(2);
       this.isButtonDisabled = false;
     });
   },

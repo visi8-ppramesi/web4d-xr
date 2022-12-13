@@ -29,6 +29,7 @@ import {
   hologram4dsComponent,
   hologram4dsPrimitive,
 } from "@/web4d/aframeComponents";
+import mitt from "@/utils/emitter";
 
 export default {
   data() {
@@ -40,14 +41,7 @@ export default {
   },
   watch: {
     $route() {
-      console.log("testtest");
       this.destroyXr();
-      if (
-        this.loadingComponent &&
-        document.getElementsByClassName("vld-container").length > 0
-      ) {
-        this.loadingComponent.hide();
-      }
     },
   },
   methods: {
@@ -55,6 +49,7 @@ export default {
       document.body.insertAdjacentHTML("beforeend", this.baseHtml.default);
     },
     destroyXr() {
+      mitt.emit("destroyModel");
       const ascene = document.getElementsByTagName("a-scene")[0];
       ascene.parentNode.removeChild(ascene);
       const eightWallLoading = document.getElementById("loadingContainer");
@@ -67,14 +62,7 @@ export default {
     },
   },
   unmounted() {
-    console.log("testtest");
     this.destroyXr();
-    if (
-      this.loadingComponent &&
-      document.getElementsByClassName("vld-container").length > 0
-    ) {
-      this.loadingComponent.hide();
-    }
   },
   mounted() {
     let scriptPromise;

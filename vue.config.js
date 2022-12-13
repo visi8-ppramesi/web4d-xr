@@ -9,4 +9,12 @@ module.exports = defineConfig({
       .use("html-loader")
       .loader("html-loader");
   },
+  devServer: {
+    hot: false,
+    liveReload: false,
+    allowedHosts: "all",
+    client: {
+      webSocketURL: "auto://0.0.0.0:0/ws",
+    },
+  },
 });

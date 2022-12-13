@@ -45,7 +45,7 @@ const hologram4dsComponent = (
         this.data["audio-4ds"], // url Audio
         [0, 0, 0], // position
         scene.renderer, // renderer
-        scene, // scene
+        scene.sceneEl.object3D, // scene
         scene.camera // camera
       );
       // Set the option to keep the downloaded data in cache, to avoid a new download upon each loop

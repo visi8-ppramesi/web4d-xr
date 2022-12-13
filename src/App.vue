@@ -14,10 +14,6 @@
   background-color: #1a1e2f;
 }
 
-nav {
-  padding: 30px;
-}
-
 nav a {
   font-weight: bold;
   color: #2c3e50;

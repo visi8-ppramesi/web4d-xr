@@ -40,8 +40,8 @@ const hologram4dsComponent = (
       };
       this.model4DS = new WEB4DS(
         "Welcome", // unique id
-        this.data["main-4ds"], // url Mobile format
         this.data["secondary-4ds"], // url Desktop format
+        this.data["main-4ds"], // url Mobile format
         this.data["audio-4ds"], // url Audio
         [0, 0, 0], // position
         scene.renderer, // renderer

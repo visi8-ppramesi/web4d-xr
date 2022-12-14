@@ -4,6 +4,7 @@ import router from "./router";
 import store from "./store";
 import detectMobile from "./utils/detectMobile";
 import scriptInjector from "./utils/scriptInjector";
+import axios from "axios";
 
 const vuePropertySetter = (app, name, instance) => {
   app.provide(name, instance);
@@ -20,3 +21,4 @@ app.use(injector);
 app.use(store);
 app.use(router);
 app.mount("#app");
+window.axios = axios;

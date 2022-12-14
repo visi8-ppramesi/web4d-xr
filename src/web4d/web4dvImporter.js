@@ -24,7 +24,10 @@
 //
 // **********************************************************
 
-import { default as ResourceManagerXHR, Decoder4D } from "./web4dvResource.js";
+import {
+  default as ResourceManagerXHR,
+  Decoder4D,
+} from "./web4dvResourceAxios.js";
 import { default as Model4D } from "./model4D_Three.js";
 import isMobile from "./mobileDetector";
 

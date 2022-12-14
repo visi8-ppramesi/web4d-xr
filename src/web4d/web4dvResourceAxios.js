@@ -11,6 +11,17 @@
 //
 //
 // **********************************************************
+// import axios from "axios";
+import { setup } from "@/axios-adapter/index";
+import axios from "axios";
+import localforage from "localforage";
+
+const forageStore = localforage.createInstance({
+  driver: localforage.INDEXEDDB,
+  name: "main-store",
+});
+
+window.forageStore = forageStore;
 
 class ChunkSerialized {
   constructor() {
@@ -186,6 +197,13 @@ export default class ResourceManagerXHR {
     this._isDownloading = false;
 
     this._file4ds = "";
+
+    this.cacheAxios = setup({
+      cache: {
+        maxAge: 15 * 60 * 1000,
+        store: forageStore, // Pass `localforage` store to `axios-cache-adapter`
+      },
+    });
   }
 
   Open(callbackFunction) {
@@ -195,17 +213,19 @@ export default class ResourceManagerXHR {
   }
 
   SetXHR(firstByte, lastByte) {
-    const xhr = new XMLHttpRequest();
-    xhr.open("GET", this._file4ds + `?fb=${firstByte}&lb=${lastByte}`);
-    // xhr.onreadystatechange = handler;
-    xhr.responseType = "arraybuffer";
-    xhr.overrideMimeType("arrayBuffer; charset=x-user-defined");
-
-    xhr.setRequestHeader("Range", `bytes=${firstByte}-${lastByte}`);
-
-    //xhr.send()  // for POST, can send a string or FormData
-
-    return xhr;
+    return axios
+      .get(this._file4ds + `?fb=${firstByte}&lb=${lastByte}`, {
+        responseType: "blob",
+        headers: {
+          Range: `bytes=${firstByte}-${lastByte}`,
+        },
+      })
+      .then(async (response) => {
+        return {
+          buffer: await response.data.arrayBuffer(),
+          status: response.status,
+        };
+      });
   }
 
   getOneChunk(position) {
@@ -214,10 +234,10 @@ export default class ResourceManagerXHR {
 
     const parent = this;
 
-    xhr.onload = function () {
-      if (xhr.status === 206) {
+    xhr.then(({ buffer, status }) => {
+      if (status === 206) {
         console.log("one chunk downloaded");
-        const headerChunk = xhr.response;
+        const headerChunk = buffer;
 
         const dv = new DataView(headerChunk);
         const type = dv.getUint8(0, true);
@@ -243,12 +263,11 @@ export default class ResourceManagerXHR {
         } else {
           parent.getChunkData(position + 9, chunkHeader.Size);
         }
-      } else if (xhr.status !== 200) {
+      } else if (status !== 200) {
         // handle error
-        console.error(`Error: ${xhr.status}`);
+        console.error(`Error: ${status}`);
       }
-    };
-    xhr.send();
+    });
   }
 
   getBunchOfChunks(onLoadCallback) {
@@ -289,10 +308,10 @@ export default class ResourceManagerXHR {
 
     const parent = this;
 
-    xhr.onload = function () {
-      if (xhr.status === 206) {
+    xhr.then(function ({ buffer, status }) {
+      if (status === 206) {
         console.log("bunch of chunks downloaded");
-        const dv = new DataView(xhr.response);
+        const dv = new DataView(buffer);
         let dataPtr = 0;
         while (memorySize > 0) {
           // extract a chunk
@@ -300,7 +319,7 @@ export default class ResourceManagerXHR {
           const chunkSize = dv.getUint32(dataPtr + 5, true);
 
           const cdataArray = new Uint8Array(
-            xhr.response.slice(dataPtr + 9, dataPtr + 9 + chunkSize),
+            buffer.slice(dataPtr + 9, dataPtr + 9 + chunkSize),
             0,
             chunkSize
           );
@@ -337,10 +356,9 @@ export default class ResourceManagerXHR {
           onLoadCallback();
         }
       } else {
-        console.log(`xhr status == ${xhr.status}`);
+        console.log(`xhr status == ${status}`);
       }
-    };
-    xhr.send();
+    });
   }
 
   reinitResources() {
@@ -390,18 +408,17 @@ export default class ResourceManagerXHR {
   getChunkData(position, size) {
     const xhr = this.SetXHR(position, position + size);
 
-    xhr.onload = function () {
-      if (xhr.status === 206) {
+    xhr.then(function ({ status, buffer }) {
+      if (status === 206) {
         console.log("chunk Data Downloaded");
 
-        return xhr.response;
+        return buffer;
       } else if (xhr.status !== 200) {
         // handle error
-        alert(`Error: ${xhr.status}`);
+        alert(`Error: ${status}`);
         return null;
       } else return null;
-    };
-    xhr.send();
+    });
   }
 
   getFileHeader() {
@@ -409,11 +426,11 @@ export default class ResourceManagerXHR {
     console.log(`file : ${this._file4ds}`);
     const parent = this;
 
-    xhr.onload = function () {
-      if (xhr.status === 206 && xhr.readyState === 4) {
+    xhr.then(function ({ status, buffer }) {
+      if (status === 206) {
         console.log("Header Downloaded");
 
-        const headerChunk = xhr.response;
+        const headerChunk = buffer;
 
         const dv = new DataView(headerChunk);
         const version = dv.getInt16(4, true);
@@ -432,12 +449,11 @@ export default class ResourceManagerXHR {
 
         // sequence info
         parent.getOneChunk(parent._pointerToSequenceInfo);
-      } else if (xhr.status !== 200) {
+      } else if (status !== 200) {
         // handle error
-        alert(`Error: ${xhr.status}`);
+        alert(`Error: ${status}`);
       }
-    };
-    xhr.send();
+    });
   }
 
   getSequenceInfo(position, size) {
@@ -445,10 +461,10 @@ export default class ResourceManagerXHR {
 
     const parent = this;
 
-    xhr.onload = function () {
-      if (xhr.status === 206) {
+    xhr.then(function ({ status, buffer }) {
+      if (status === 206) {
         console.log("sequences info downloaded");
-        const dv = new DataView(xhr.response);
+        const dv = new DataView(buffer);
         parent._sequenceInfo.NbFrames = dv.getUint32(0, true);
         parent._sequenceInfo.NbBlocs = dv.getUint32(4, true);
         parent._sequenceInfo.FrameRate = dv.getFloat32(8, true);
@@ -468,12 +484,11 @@ export default class ResourceManagerXHR {
         if (parent._sequenceInfo.NbAdditionalTracks > 0) {
           parent.getOneChunk(parent._pointerToTrackIndex);
         }
-      } else if (xhr.status !== 200) {
+      } else if (status !== 200) {
         // handle error
-        alert(`Error: ${xhr.status}`);
+        alert(`Error: ${status}`);
       }
-    };
-    xhr.send();
+    });
   }
 
   getBlocsInfos(position, size) {
@@ -481,10 +496,10 @@ export default class ResourceManagerXHR {
 
     const parent = this;
 
-    xhr.onload = function () {
-      if (xhr.status === 206) {
+    xhr.then(function ({ status, buffer }) {
+      if (status === 206) {
         console.log("blocs info downloaded");
-        const dv = new DataView(xhr.response);
+        const dv = new DataView(buffer);
 
         parent._KFPositions.push(79);
 
@@ -508,12 +523,11 @@ export default class ResourceManagerXHR {
         parent._isInitialized = true;
         parent._callback();
         // parent.Read();
-      } else if (xhr.status !== 200) {
+      } else if (status !== 200) {
         // handle error
-        alert(`Error: ${xhr.status}`);
+        alert(`Error: ${status}`);
       }
-    };
-    xhr.send();
+    });
   }
 
   getTracksIndexes(position, size) {
@@ -521,22 +535,21 @@ export default class ResourceManagerXHR {
 
     const parent = this;
 
-    xhr.onload = function () {
-      if (xhr.status === 206) {
+    xhr.then(function ({ status, buffer }) {
+      if (status === 206) {
         console.log("track indexes downloaded");
-        const dv = new DataView(xhr.response);
+        const dv = new DataView(buffer);
 
         for (let i = 0; i < parent._sequenceInfo.NbAdditionalTracks; i++) {
           parent._tracksPositions.push(dv.getInt32(i * 8, true));
 
           parent.getOneChunk(parent._tracksPositions[i]);
         }
-      } else if (xhr.status !== 200) {
+      } else if (status !== 200) {
         // handle error
-        alert(`Error: ${xhr.status}`);
+        alert(`Error: ${status}`);
       }
-    };
-    xhr.send();
+    });
   }
 
   getAudioTrack(position, size) {
@@ -544,18 +557,17 @@ export default class ResourceManagerXHR {
 
     const parent = this;
 
-    xhr.onload = function () {
-      if (xhr.status === 206) {
-        console.log(xhr.response);
+    xhr.then(function ({ status, buffer }) {
+      if (status === 206) {
+        console.log("audio track downloaded");
         // var dv = new DataView(xhr.response);
 
-        parent._audioTrack = xhr.response;
-      } else if (xhr.status !== 200) {
+        parent._audioTrack = buffer;
+      } else if (status !== 200) {
         // handle error
-        alert(`Error: ${xhr.status}`);
+        alert(`Error: ${status}`);
       }
-    };
-    xhr.send();
+    });
   }
 
   set4DSFile(file) {

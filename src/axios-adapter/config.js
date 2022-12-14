@@ -73,7 +73,10 @@ const makeConfig = function (override = {}) {
   }
 
   // Create an in memory store if none was given
-  if (!config.store) config.store = new MemoryStore();
+  if (!config.store) {
+    console.log("using memory store");
+    config.store = new MemoryStore();
+  }
 
   config.debug("Global cache config", config);
 

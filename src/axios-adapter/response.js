@@ -1,14 +1,14 @@
 import limit from "./limit";
 import { write } from "./cache";
 import { parse } from "cache-control-esm";
-
+/* eslint-disable no-unused-vars */
 async function response(config, req, res) {
   const { request = {}, headers = {} } = res;
 
   // exclude binary response from cache
-  if (["arraybuffer", "blob"].indexOf(request.responseType) > -1) {
-    return res;
-  }
+  // if (["arraybuffer", "blob"].indexOf(request.responseType) > -1) {
+  //   return res;
+  // }
 
   let cacheControl = {};
 

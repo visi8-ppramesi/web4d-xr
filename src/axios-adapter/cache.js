@@ -1,17 +1,21 @@
 import { isString, isFunction } from "./utilities";
 import md5 from "md5";
 
-import serialize from "./serialize";
-
+// import serialize from "./serialize";
+/* eslint-disable no-unused-vars */
 async function write(config, req, res) {
   try {
+    let { data, ...restRes } = res;
     const entry = {
       expires: config.expires,
-      data: serialize(config, req, res),
+      data: { res: {} },
+      status: res.status,
+      shitfuck: data,
     };
-
+    console.log("trying to write", entry);
     await config.store.setItem(config.uuid, entry);
   } catch (err) {
+    console.error("Could not store response", err);
     config.debug("Could not store response", err);
 
     if (config.clearOnError) {
@@ -43,7 +47,7 @@ async function read(config, req) {
     throw error;
   }
 
-  const { expires, data } = entry;
+  const { expires, shitfuck, status } = entry;
 
   // Do not check for stale cache if offline on client-side
   const offline =
@@ -68,7 +72,7 @@ async function read(config, req) {
 
   config.debug(config.acceptStale ? "cache-hit-stale" : "cache-hit", req.url);
 
-  return data;
+  return { data: shitfuck, status };
 }
 
 function key(config) {

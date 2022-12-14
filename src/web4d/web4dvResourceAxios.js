@@ -13,14 +13,13 @@
 // **********************************************************
 // import axios from "axios";
 import { setup } from "@/axios-adapter/index";
-import axios from "axios";
+// import axios from "axios";
 import localforage from "localforage";
 
 const forageStore = localforage.createInstance({
   driver: localforage.INDEXEDDB,
   name: "main-store",
 });
-
 window.forageStore = forageStore;
 
 class ChunkSerialized {
@@ -200,7 +199,7 @@ export default class ResourceManagerXHR {
 
     this.cacheAxios = setup({
       cache: {
-        maxAge: 15 * 60 * 1000,
+        maxAge: 24 * 60 * 60 * 1000,
         store: forageStore, // Pass `localforage` store to `axios-cache-adapter`
       },
     });
@@ -213,7 +212,7 @@ export default class ResourceManagerXHR {
   }
 
   SetXHR(firstByte, lastByte) {
-    return axios
+    return this.cacheAxios
       .get(this._file4ds + `?fb=${firstByte}&lb=${lastByte}`, {
         responseType: "blob",
         headers: {
@@ -221,6 +220,7 @@ export default class ResourceManagerXHR {
         },
       })
       .then(async (response) => {
+        console.log("response", response);
         return {
           buffer: await response.data.arrayBuffer(),
           status: response.status,

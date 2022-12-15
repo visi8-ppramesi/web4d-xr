@@ -17,6 +17,11 @@ const routes = [
     name: "viewer",
     component: () => import("../views/ViewerScene.vue"),
   },
+  {
+    path: "/delete-storage",
+    name: "deleteStorage",
+    component: () => import("../views/DeleteStorage.vue"),
+  },
 ];
 
 const router = createRouter({

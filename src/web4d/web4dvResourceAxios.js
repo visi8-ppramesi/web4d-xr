@@ -198,6 +198,7 @@ export default class ResourceManagerXHR {
     this._file4ds = "";
 
     this.cacheAxios = setup({
+      withCredentials: false,
       cache: {
         maxAge: 24 * 60 * 60 * 1000,
         store: forageStore, // Pass `localforage` store to `axios-cache-adapter`
@@ -212,8 +213,10 @@ export default class ResourceManagerXHR {
   }
 
   SetXHR(firstByte, lastByte) {
+    const address = this._file4ds + `#fb${firstByte}lb${lastByte}`;
+    console.log("address", address);
     return this.cacheAxios
-      .get(this._file4ds + `?fb=${firstByte}&lb=${lastByte}`, {
+      .get(address, {
         responseType: "blob",
         headers: {
           Range: `bytes=${firstByte}-${lastByte}`,

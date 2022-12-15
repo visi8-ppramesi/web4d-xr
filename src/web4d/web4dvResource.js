@@ -196,7 +196,9 @@ export default class ResourceManagerXHR {
 
   SetXHR(firstByte, lastByte) {
     const xhr = new XMLHttpRequest();
-    xhr.open("GET", this._file4ds + `?fb=${firstByte}&lb=${lastByte}`);
+    const address = this._file4ds + `#fb${firstByte}lb${lastByte}`
+    console.log("address", address);
+    xhr.open("GET", address);
     // xhr.onreadystatechange = handler;
     xhr.responseType = "arraybuffer";
     xhr.overrideMimeType("arrayBuffer; charset=x-user-defined");

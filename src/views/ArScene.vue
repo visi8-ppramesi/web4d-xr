@@ -26,6 +26,7 @@
 
 <script>
 import {
+  betterHoldDrag,
   hologram4dsComponent,
   hologram4dsPrimitive,
 } from "@/web4d/aframeComponents";
@@ -77,7 +78,7 @@ export default {
         ),
         this.injectScript(
           "8frame-script",
-          `https://cdn.8thwall.com/web/aframe/8frame-1.2.0.min.js`,
+          `https://cdn.8thwall.com/web/aframe/8frame-1.3.0.min.js`,
           () => {
             return Promise.all([
               this.injectScript(
@@ -92,6 +93,7 @@ export default {
                     muteBtn,
                   });*/
                   hologram4dsPrimitive(window.AFRAME);
+                  betterHoldDrag(window.AFRAME);
                   return Promise.resolve(true);
                 }
               ),

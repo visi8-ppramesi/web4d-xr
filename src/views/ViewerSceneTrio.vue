@@ -44,7 +44,7 @@ export default {
     const container = document.getElementById("viewer-container");
     this.fourDScene = new Web4DScene(container, canvas, [
       "https://dev.fourdviews.com/ltd/Trio_Take_4_20_00fps_FILTERED_MOBILE_1440.4ds",
-      "https://dev.fourdviews.com/ltd/Trio_Take_4_20_00fps_FILTERED_MOBILE_1920.4ds",
+      "https://dev.fourdviews.com/ltd/Trio_Take_4_20_00fps_FILTERED_MOBILE_1440.4ds",
       "https://dev.fourdviews.com/ltd/Trio_Take_4.wav",
     ]);
     this.playFn = this.fourDScene.getPlayFunction();

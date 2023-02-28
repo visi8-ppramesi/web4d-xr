@@ -25,6 +25,8 @@
 // **********************************************************
 import * as THREE from "three";
 
+THREE.Cache.enabled = true;
+
 export default class Model4D {
   constructor() {
     this.geometry = null;

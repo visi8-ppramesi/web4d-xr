@@ -8,14 +8,24 @@ const routes = [
     component: HomeView,
   },
   {
-    path: "/ar",
-    name: "ar",
-    component: () => import("../views/ArScene.vue"),
+    path: "/ar-fire",
+    name: "ar-fire",
+    component: () => import("../views/ArSceneFire.vue"),
   },
   {
-    path: "/viewer",
-    name: "viewer",
-    component: () => import("../views/ViewerScene.vue"),
+    path: "/ar-trio",
+    name: "ar-trio",
+    component: () => import("../views/ArSceneTrio.vue"),
+  },
+  {
+    path: "/viewer-fire",
+    name: "viewer-fire",
+    component: () => import("../views/ViewerSceneFire.vue"),
+  },
+  {
+    path: "/viewer-trio",
+    name: "viewer-trio",
+    component: () => import("../views/ViewerSceneTrio.vue"),
   },
   {
     path: "/delete-storage",

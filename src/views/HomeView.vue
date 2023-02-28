@@ -1,9 +1,17 @@
 <template>
   <div class="home">
     <div class="buttons-container">
-      <button class="button" @click="$router.push('/ar')">Show AR Scene</button>
-      <button class="button" @click="$router.push('/viewer')">
-        Show 4D Viewer
+      <button class="button" @click="$router.push('/ar-fire')">
+        Show AR Scene (Fire)
+      </button>
+      <button class="button" @click="$router.push('/viewer-fire')">
+        Show 4D Viewer (Fire)
+      </button>
+      <button class="button" @click="$router.push('/ar-trio')">
+        Show AR Scene (Trio)
+      </button>
+      <button class="button" @click="$router.push('/viewer-trio')">
+        Show 4D Viewer (Trio)
       </button>
     </div>
   </div>

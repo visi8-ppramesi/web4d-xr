@@ -35,7 +35,7 @@ import mitt from "@/utils/emitter";
 export default {
   data() {
     return {
-      baseHtml: require("../web4d/aframeSceneExample.html"),
+      baseHtml: require("../web4d/aframeSceneFire.html"),
       pauseBtn: require("../assets/icons/pause.svg"),
       muteBtn: require("../assets/icons/mute.svg"),
     };

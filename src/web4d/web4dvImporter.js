@@ -327,7 +327,7 @@ export default class WEB4DS {
     clearInterval(this.playbackLoop);
     this.isPlaying = false;
 
-    if (Decoder4D._meshesCache >= Decoder4D._maxCacheSize) {
+    if (Decoder4D._meshesCache.length >= Decoder4D._maxCacheSize) {
       this.stopDecoding();
     }
     this.pauseAudio();

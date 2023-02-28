@@ -172,7 +172,7 @@ export default class WEB4DS {
       // eslint-disable-next-line no-unused-vars
       this.resolvedPromise = new Promise((resolve, reject) => {
         setInterval(() => {
-          if (this.firstLoaded) {
+          if (this.firstLoaded && this.isAudioloaded) {
             resolve(true);
           }
         }, 10);
@@ -223,7 +223,10 @@ export default class WEB4DS {
         this.loadAudio(this.urlA);
 
         const waiter = setInterval(() => {
-          if (Decoder4D._meshesCache.length >= Decoder4D._maxCacheSize) {
+          if (
+            Decoder4D._meshesCache.length >= Decoder4D._maxCacheSize &&
+            this.isAudioloaded
+          ) {
             this.firstLoaded = true;
             clearInterval(waiter); // Stop the waiter loop
 

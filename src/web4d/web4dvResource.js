@@ -196,7 +196,7 @@ export default class ResourceManagerXHR {
 
   SetXHR(firstByte, lastByte) {
     const xhr = new XMLHttpRequest();
-    const address = this._file4ds + `#fb${firstByte}lb${lastByte}`
+    const address = this._file4ds + `#fb${firstByte}lb${lastByte}`;
     console.log("address", address);
     xhr.open("GET", address);
     // xhr.onreadystatechange = handler;

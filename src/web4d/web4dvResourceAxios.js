@@ -223,7 +223,7 @@ export default class ResourceManagerXHR {
         },
       })
       .then(async (response) => {
-        console.log("response", response);
+        // console.log("response", response);
         return {
           buffer: await response.data.arrayBuffer(),
           status: response.status,
@@ -313,7 +313,7 @@ export default class ResourceManagerXHR {
 
     xhr.then(function ({ buffer, status }) {
       if (status === 206) {
-        console.log("bunch of chunks downloaded");
+        // console.log("bunch of chunks downloaded");
         const dv = new DataView(buffer);
         let dataPtr = 0;
         while (memorySize > 0) {
@@ -413,7 +413,7 @@ export default class ResourceManagerXHR {
 
     xhr.then(function ({ status, buffer }) {
       if (status === 206) {
-        console.log("chunk Data Downloaded");
+        // console.log("chunk Data Downloaded");
 
         return buffer;
       } else if (xhr.status !== 200) {
@@ -426,12 +426,12 @@ export default class ResourceManagerXHR {
 
   getFileHeader() {
     const xhr = this.SetXHR(0, 30);
-    console.log(`file : ${this._file4ds}`);
+    // console.log(`file : ${this._file4ds}`);
     const parent = this;
 
     xhr.then(function ({ status, buffer }) {
       if (status === 206) {
-        console.log("Header Downloaded");
+        // console.log("Header Downloaded");
 
         const headerChunk = buffer;
 

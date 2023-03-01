@@ -293,7 +293,7 @@ export default class ResourceManagerXHR {
 
     xhr.onload = function () {
       if (xhr.status === 206) {
-        console.log("bunch of chunks downloaded");
+        // console.log("bunch of chunks downloaded");
         const dv = new DataView(xhr.response);
         let dataPtr = 0;
         while (memorySize > 0) {

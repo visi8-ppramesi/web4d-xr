@@ -158,10 +158,13 @@ export default class WEB4DS {
       modelPosition
     );
 
-    this.scene.add(this.model4D.mesh);
+    document.querySelector("hologram-4ds").object3D.add(this.model4D.mesh);
+    this.scene.object3D.add(this.model4D.surface);
+    this.scene.object3D.add(this.model4D.light);
+    // this.scene.add(this.model4D.mesh);
 
-    this.scene.add(this.model4D.surface);
-    this.scene.add(this.model4D.light);
+    // this.scene.add(this.model4D.surface);
+    // this.scene.add(this.model4D.light);
 
     this.renderer.shadowMap.enabled = true;
     this.renderer.shadowMapSoft = true;

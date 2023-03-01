@@ -97,10 +97,10 @@ export default {
                   return Promise.resolve(true);
                 }
               ),
-              this.injectScript(
-                "aframe-extras-script",
-                `https://cdn.8thwall.com/web/aframe/aframe-extras-6.1.1.min.js`
-              ),
+              // this.injectScript(
+              //   "aframe-extras-script",
+              //   `https://cdn.8thwall.com/web/aframe/aframe-extras-6.1.1.min.js`
+              // ),
             ]);
           }
         ),

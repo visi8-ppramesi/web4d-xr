@@ -47,12 +47,13 @@ const betterHoldDrag = (aFrameInstance) => {
         this.startDrag = this.startDrag.bind(this);
         this.fingerMove = this.fingerMove.bind(this);
         this.fingerUp = this.fingerUp.bind(this);
+        window.testEl = this.el;
         this.el.addEventListener("mousedown", this.fingerDown);
         this.el.sceneEl.addEventListener("onefingermove", this.fingerMove);
         this.el.sceneEl.addEventListener("onefingerend", this.fingerUp);
         this.el.classList.add("cantap");
         this.initialHeight = this.el.object3D.position.y;
-        console.log("better hold drag initialized");
+        // console.log("better hold drag initialized");
       }.bind(this);
       this.el.addEventListener("we-ready", innerInit);
     },
@@ -102,7 +103,7 @@ const betterHoldDrag = (aFrameInstance) => {
       }
     },
     fingerDown(e) {
-      console.log("fingerDown");
+      // console.log("fingerDown");
       /** @type {boolean} */
       this.internalState.fingerDown = true;
       /** @type {number} */
@@ -114,7 +115,7 @@ const betterHoldDrag = (aFrameInstance) => {
     },
     //eslint-disable-next-line no-unused-vars
     startDrag(snapToCenter) {
-      console.log("startDrag");
+      // console.log("startDrag");
       if (this.internalState.fingerDown) {
         /** @type {boolean} */
         this.internalState.dragging = true;
@@ -124,12 +125,12 @@ const betterHoldDrag = (aFrameInstance) => {
       }
     },
     fingerMove(e) {
-      console.log("fingerMove");
+      // console.log("fingerMove");
       this.internalState.positionRaw = e.detail.positionRaw;
     },
     //eslint-disable-next-line no-unused-vars
     fingerUp(e) {
-      console.log("fingerUp");
+      // console.log("fingerUp");
       this.internalState.fingerDown = false;
       clearTimeout(this.internalState.startDragTimeout);
       this.internalState.positionRaw = null;
@@ -187,7 +188,7 @@ const hologram4dsComponent = (
           once: true,
         });
         this.el.emit("we-ready", { success: true });
-        console.log("we ready");
+        // console.log("we ready");
       };
       this.model4DS = new WEB4DS(
         "Welcome", // unique id
@@ -196,7 +197,7 @@ const hologram4dsComponent = (
         this.data["audio-4ds"], // url Audio
         [0, 0, 0], // position
         scene.renderer, // renderer
-        scene.sceneEl.object3D, // scene
+        scene, // scene
         scene.camera // camera
       );
       // Set the option to keep the downloaded data in cache, to avoid a new download upon each loop

@@ -1,5 +1,8 @@
 <template>
   <div class="home">
+    <div>
+      <img class="logo" :src="logo" />
+    </div>
     <div class="buttons-container">
       <button class="button" @click="$router.push('/ar-fire')">
         Show AR Scene (Fire)
@@ -22,15 +25,26 @@
 
 export default {
   name: "HomeView",
+  data() {
+    return {
+      logo: require("../assets/visi8.png"),
+    };
+  },
 };
 </script>
 
 <style>
+.logo {
+  width: 195px;
+  margin-bottom: 30px;
+}
 .home {
   width: 100vw;
   height: 100vh;
   display: flex;
+  flex-direction: column;
   align-items: center;
+  justify-content: center;
 }
 
 .buttons-container {

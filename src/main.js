@@ -5,6 +5,7 @@ import store from "./store";
 import detectMobile from "./utils/detectMobile";
 import scriptInjector from "./utils/scriptInjector";
 import axios from "axios";
+import "./main.css";
 
 const vuePropertySetter = (app, name, instance) => {
   app.provide(name, instance);

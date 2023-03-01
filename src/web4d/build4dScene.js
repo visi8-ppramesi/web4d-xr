@@ -162,7 +162,8 @@ export default class Web4DScene {
       [0, 0, 0],
       this.renderer,
       this.scene,
-      this.camera
+      this.camera,
+      "threejs"
     );
     this.web4dmodel.load(false, false);
 
@@ -293,7 +294,8 @@ export function build4DScene(canvasElement, modelArray) {
     [0, 0, 0],
     renderer,
     scene,
-    camera
+    camera,
+    "threejs"
   );
   let model4DS02 = new WEB4DS(
     "basket",
@@ -303,7 +305,8 @@ export function build4DScene(canvasElement, modelArray) {
     [2, 0, 1],
     renderer,
     scene,
-    camera
+    camera,
+    "threejs"
   );
 
   sequences4D.push(model4DS01);

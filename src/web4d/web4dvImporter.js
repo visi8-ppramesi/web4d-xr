@@ -36,7 +36,20 @@ const resourceManager = new ResourceManagerXHR();
 
 // MAIN CLASS MANAGING A 4DS
 export default class WEB4DS {
-  constructor(id, urlD, urlM, urlA, position, renderer, scene, camera) {
+  constructor(
+    id,
+    urlD,
+    urlM,
+    urlA,
+    position,
+    renderer,
+    scene,
+    camera,
+    platform = "aframe"
+  ) {
+    if (!(platform === "aframe" || platform === "threejs")) {
+      throw new Error("platform neither aframe nor threejs");
+    }
     this.firstLoaded = false;
     /** properties, options and status modifiable by user **/
 
@@ -49,6 +62,7 @@ export default class WEB4DS {
     this.renderer = renderer; //three.js rendrer reference
     this.scene = scene; //three.js scene reference
     this.camera = camera; //three.js camera reference
+    this.platform = platform;
 
     this.model4D = new Model4D(); //three.js Object represneting the mesh 4d
     this.sequenceTotalLength = 0; //sequence number of frames
@@ -158,13 +172,16 @@ export default class WEB4DS {
       modelPosition
     );
 
-    document.querySelector("hologram-4ds").object3D.add(this.model4D.mesh);
-    this.scene.object3D.add(this.model4D.surface);
-    this.scene.object3D.add(this.model4D.light);
-    // this.scene.add(this.model4D.mesh);
+    if (this.platform === "aframe") {
+      document.querySelector("hologram-4ds").object3D.add(this.model4D.mesh);
+      this.scene.object3D.add(this.model4D.surface);
+      this.scene.object3D.add(this.model4D.light);
+    } else if (this.platform === "threejs") {
+      this.scene.add(this.model4D.mesh);
 
-    // this.scene.add(this.model4D.surface);
-    // this.scene.add(this.model4D.light);
+      this.scene.add(this.model4D.surface);
+      this.scene.add(this.model4D.light);
+    }
 
     this.renderer.shadowMap.enabled = true;
     this.renderer.shadowMapSoft = true;

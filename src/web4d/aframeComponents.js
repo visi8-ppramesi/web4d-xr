@@ -198,7 +198,8 @@ const hologram4dsComponent = (
         [0, 0, 0], // position
         scene.renderer, // renderer
         scene, // scene
-        scene.camera // camera
+        scene.camera, // camera
+        "aframe"
       );
       // Set the option to keep the downloaded data in cache, to avoid a new download upon each loop
       this.model4DS.keepsChunksInCache(false);

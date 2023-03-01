@@ -119,6 +119,9 @@ export default {
 </script>
 
 <style>
+.poweredby-img {
+  display: none !important;
+}
 #progressBar {
   position: absolute;
   width: 60vw;
